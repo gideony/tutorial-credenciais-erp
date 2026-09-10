@@ -1,0 +1,33 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+public_folder: "images"
+
+collections:
+  - name: "config"
+    label: "Configurações Gerais"
+    files:
+      - label: "Textos Principais"
+        name: "settings"
+        file: "content/settings.json"
+        fields:
+          - {label: "Título Principal", name: "title", widget: "string"}
+          - {label: "Subtítulo", name: "subtitle", widget: "string"}
+          - {label: "Texto do Rodapé", name: "footer_text", widget: "text"}
+
+  - name: "tutorials"
+    label: "Tutoriais (Sistemas)"
+    files:
+      - label: "Sistemas ERP"
+        name: "systems_list"
+        file: "content/tutorials.json"
+        fields:
+          - label: "Sistemas"
+            name: "systems"
+            widget: "list"
+            fields:
+              - {label: "Nome do Sistema", name: "name", widget: "string"}
+              - {label: "Corpo do Texto (Passo a passo)", name: "content", widget: "markdown", required: false}
+              - {label: "Imagem", name: "image", widget: "image", required: false}
