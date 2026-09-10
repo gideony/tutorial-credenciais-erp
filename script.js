@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const tutorialTitle = document.getElementById('tutorialTitle');
     const tutorialContainer = document.getElementById('tutorialContainer');
 
+    const tutorials = {
+        "SGP": `
+            <p><strong>Passo 1:</strong> Acesse Administração > Integrações > Tokens.</p>
+            <p><strong>Passo 2:</strong> Clique em "Adicionar token" no canto superior direito. Em descrição, digite "Azos". Em aplicações, clique no botão "+" e digite "Azos" nos dois campos.</p>
+            <p><strong>Passo 3:</strong> Após salvar, o token será gerado. Seu App: Azos / Seu Token: a chave gerada / Sua URL: o endereço do navegador (ex.: https://seusgp.com.br).</p>
+            <p><strong>Dica:</strong> crie credenciais exclusivas para a Azos. Em caso de duvidas, entre em contato com o suporte.</p>
+            <img src="sgp-passo-a-passo.png" alt="SGP - Passo a passo" class="tutorial-image">
+        `
+    };
+
     // Generate buttons
     erpSystems.forEach(system => {
         const button = document.createElement('button');
@@ -35,6 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
         instructionText.classList.add('hidden');
         tutorialContent.classList.remove('hidden');
         tutorialTitle.textContent = `${systemName} — Passo a passo`;
+
+        const tutorialSteps = document.querySelector('.tutorial-steps');
+        if (tutorials[systemName]) {
+            tutorialSteps.innerHTML = tutorials[systemName];
+        } else {
+            tutorialSteps.innerHTML = `<p>Siga os passos indicados para encontrar as credenciais no seu sistema.</p>`;
+        }
 
         // Smooth scroll to the tutorial container
         tutorialContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
