@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p><strong>Passo 2:</strong> Clique em "Adicionar token" no canto superior direito. Em descrição, digite "Azos". Em aplicações, clique no botão "+" e digite "Azos" nos dois campos.</p>
             <p><strong>Passo 3:</strong> Após salvar, o token será gerado. Seu App: Azos / Seu Token: a chave gerada / Sua URL: o endereço do navegador (ex.: https://seusgp.com.br).</p>
             <p><strong>Dica:</strong> crie credenciais exclusivas para a Azos. Em caso de duvidas, entre em contato com o suporte.</p>
-            <img src="sgp-passo-a-passo.png" alt="SGP - Passo a passo" class="tutorial-image">
+            <img src="images/sgp-passo-a-passo.png" alt="SGP - Passo a passo" class="tutorial-image">
         `
     };
 
