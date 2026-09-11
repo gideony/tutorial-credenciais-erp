@@ -2,9 +2,15 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const basicAuth = require('express-basic-auth');
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -14,6 +20,13 @@ const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
+
+// Setup Basic Auth specifically for admin routes
+const auth = basicAuth({
+    users: { 'admin': process.env.ADMIN_PASSWORD || 'azos123' },
+    challenge: true,
+    unauthorizedResponse: 'Acesso negado'
+});
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -25,7 +38,15 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + '-' + file.originalname);
     }
 });
-const upload = multer({ storage: storage });
+// Filter to only accept images
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Apenas imagens são permitidas!'), false);
+    }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 const DATA_FILE = path.join(__dirname, 'data', 'data.json');
 
@@ -43,15 +64,26 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
+// Protect admin.html via basic auth middleware specifically for that path
+app.get('/admin.html', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // API to get ERP list
 app.get('/api/erps', (req, res) => {
     res.json(getData().erps);
 });
 
-// API to add an ERP
-app.post('/api/erps', upload.single('image'), (req, res) => {
+// API to add an ERP (Protected)
+app.post('/api/erps', auth, upload.single('image'), (req, res) => {
     const data = getData();
-    const { name, title, message } = req.body;
+    let { name, title, message } = req.body;
+
+    // Sanitize user inputs to prevent XSS
+    name = DOMPurify.sanitize(name);
+    title = DOMPurify.sanitize(title);
+    message = DOMPurify.sanitize(message);
+
     let imagePath = null;
 
     if (req.file) {
