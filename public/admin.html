@@ -25,7 +25,18 @@
     </header>
 
     <div class="admin-container">
-        <h2>Cadastrar / Editar ERP</h2>
+        <h2>Gerenciar ERPs</h2>
+
+        <div class="form-group">
+            <label for="erpSelect">Selecione um ERP para editar/remover (ou deixe vazio para criar um novo)</label>
+            <select id="erpSelect" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-white); margin-bottom: 20px;">
+                <option value="">-- Criar Novo ERP --</option>
+            </select>
+            <button id="deleteBtn" class="submit-btn" style="background-color: #e53e3e; display: none; margin-bottom: 20px;">Remover ERP Selecionado</button>
+        </div>
+        <hr style="border: 1px solid var(--border-color); margin-bottom: 20px;">
+
+        <h2 id="formTitle">Cadastrar Novo ERP</h2>
         <form id="erpForm">
             <div class="form-group">
                 <label for="erpName">Nome do ERP (Ex: SGP, IXC)</label>

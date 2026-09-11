@@ -108,6 +108,22 @@ app.post('/api/erps', auth, upload.single('image'), (req, res) => {
     res.json({ success: true, erp: erpData });
 });
 
+// API to delete an ERP (Protected)
+app.delete('/api/erps/:name', auth, (req, res) => {
+    const data = getData();
+    const name = decodeURIComponent(req.params.name);
+
+    const existingIndex = data.erps.findIndex(e => e.name === name);
+
+    if (existingIndex > -1) {
+        data.erps.splice(existingIndex, 1);
+        saveData(data);
+        res.json({ success: true, message: 'ERP removido com sucesso' });
+    } else {
+        res.status(404).json({ success: false, message: 'ERP não encontrado' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
