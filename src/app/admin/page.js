@@ -95,7 +95,7 @@ export default function AdminPage() {
 
       if (uploadError) {
         console.error("Upload error", uploadError);
-        setStatus({ text: "Erro ao enviar imagem.", type: "error" });
+        setStatus({ text: `Erro ao enviar imagem: ${uploadError.message}`, type: "error" });
         return;
       }
 
@@ -124,7 +124,7 @@ export default function AdminPage() {
 
     if (error) {
         console.error("Save error", error);
-        setStatus({ text: "Erro ao salvar ERP.", type: "error" });
+        setStatus({ text: `Erro ao salvar ERP: ${error.message}`, type: "error" });
     } else {
         setStatus({ text: "ERP salvo com sucesso!", type: "success" });
         if (selectedIndex === "") {
