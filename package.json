@@ -1,30 +1,21 @@
 {
-  "name": "app",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "temp_app",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gideony/tutorial-credenciais-erp.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/gideony/tutorial-credenciais-erp/issues"
-  },
-  "homepage": "https://github.com/gideony/tutorial-credenciais-erp#readme",
   "dependencies": {
-    "cors": "^2.8.6",
-    "dompurify": "^3.4.15",
-    "express": "^5.2.1",
-    "express-basic-auth": "^1.2.1",
-    "jsdom": "^29.1.1",
-    "multer": "^2.3.0"
+    "@supabase/supabase-js": "^2.116.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35"
   }
 }
