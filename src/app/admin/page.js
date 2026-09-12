@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import dynamic from 'next/dynamic';
@@ -14,6 +14,8 @@ export default function AdminPage() {
   const [selectedIndex, setSelectedIndex] = useState("");
   const [status, setStatus] = useState({ text: "", type: "" });
   const formRef = useRef(null);
+
+  const quillRef = useRef(null);
 
   // Form states
   const [name, setName] = useState("");
@@ -95,6 +97,73 @@ export default function AdminPage() {
     }
   };
 
+  const imageHandler = useCallback(() => {
+    // Capture the editor's cursor position BEFORE opening the file picker,
+    // otherwise the editor loses focus and the range becomes null.
+    const editor = quillRef.current.getEditor();
+    const range = editor.getSelection(true); // pass true to focus if necessary
+
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (file) {
+        setStatus({ text: "Enviando imagem...", type: "loading" });
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+          const response = await fetch('/api/admin/upload-image', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Erro no upload da imagem');
+          }
+
+          // Insert the image at the captured cursor position
+          editor.insertEmbed(range ? range.index : 0, 'image', data.url);
+
+          // Move the cursor after the inserted image
+          if (range) {
+             editor.setSelection(range.index + 1);
+          }
+
+          setStatus({ text: "Imagem enviada!", type: "success" });
+
+          // Clear status after 3 seconds
+          setTimeout(() => setStatus({ text: "", type: "" }), 3000);
+
+        } catch (error) {
+          console.error("Erro no upload da imagem inline:", error);
+          setStatus({ text: `Erro: ${error.message}`, type: "error" });
+        }
+      }
+    };
+  }, []); // useCallback has no dependencies here
+
+  // useMemo prevents the quill editor from completely destroying and remounting on every keystroke
+  const modules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        ['link', 'image'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler
+      }
+    }
+  }), [imageHandler]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ text: "Salvando...", type: "loading" });
@@ -164,7 +233,7 @@ export default function AdminPage() {
 
         /* React Quill Dark Mode Adjustments */
         .ql-toolbar { background-color: #2D3748; border-color: var(--border-color) !important; border-top-left-radius: 4px; border-top-right-radius: 4px; }
-        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; background-color: var(--bg-color); color: var(--text-white); font-family: inherit; font-size: 16px; height: 200px; }
+        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; background-color: var(--bg-color); color: var(--text-white); font-family: inherit; font-size: 16px; height: 300px; }
         .ql-stroke { stroke: #A0AEC0 !important; }
         .ql-fill { fill: #A0AEC0 !important; }
         .ql-picker { color: #A0AEC0 !important; }
@@ -234,15 +303,18 @@ export default function AdminPage() {
           <div className="form-group">
             <label htmlFor="erpMessage">Corpo do Texto</label>
             <ReactQuill
+              ref={quillRef}
               theme="snow"
               value={message}
               onChange={setMessage}
               placeholder="Escreva o tutorial aqui..."
+              modules={modules}
             />
           </div>
 
+          {/* Manter a opção de imagem principal como capa opcional */}
           <div className="form-group">
-            <label htmlFor="erpImage">Imagem do Tutorial</label>
+            <label htmlFor="erpImage">Imagem Principal / Capa (Opcional)</label>
             <input
               type="file"
               id="erpImage"

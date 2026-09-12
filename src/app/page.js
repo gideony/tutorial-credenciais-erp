@@ -72,7 +72,9 @@ export default function Home() {
               <h2>{selectedErp.title || `${selectedErp.name} — Passo a passo`}</h2>
               <div className="tutorial-steps">
                 {selectedErp.message ? (
-                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedErp.message) }} />
+                  <div dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(selectedErp.message, { ADD_ATTR: ['class'] })
+                  }} />
                 ) : (
                   <p>As instruções para este sistema ainda não foram cadastradas.</p>
                 )}
