@@ -3,6 +3,11 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+
+// Dynamically import react-quill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function AdminPage() {
   const [erps, setErps] = useState([]);
@@ -156,6 +161,15 @@ export default function AdminPage() {
         .status-loading { color: var(--text-gray); }
         .status-success { color: var(--primary-green); }
         .status-error { color: #e53e3e; }
+
+        /* React Quill Dark Mode Adjustments */
+        .ql-toolbar { background-color: #2D3748; border-color: var(--border-color) !important; border-top-left-radius: 4px; border-top-right-radius: 4px; }
+        .ql-container { border-color: var(--border-color) !important; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; background-color: var(--bg-color); color: var(--text-white); font-family: inherit; font-size: 16px; height: 200px; }
+        .ql-stroke { stroke: #A0AEC0 !important; }
+        .ql-fill { fill: #A0AEC0 !important; }
+        .ql-picker { color: #A0AEC0 !important; }
+        .ql-editor.ql-blank::before { color: #718096 !important; }
+        .ql-snow .ql-picker-options { background-color: #2D3748 !important; border-color: var(--border-color) !important; }
       `}} />
 
       <header className="header">
@@ -218,13 +232,13 @@ export default function AdminPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="erpMessage">Corpo do Texto (Você pode usar tags HTML como &lt;p&gt; e &lt;strong&gt;)</label>
-            <textarea
-              id="erpMessage"
-              required
+            <label htmlFor="erpMessage">Corpo do Texto</label>
+            <ReactQuill
+              theme="snow"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            ></textarea>
+              onChange={setMessage}
+              placeholder="Escreva o tutorial aqui..."
+            />
           </div>
 
           <div className="form-group">
