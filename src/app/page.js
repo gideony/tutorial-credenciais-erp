@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import DOMPurify from "isomorphic-dompurify";
 
 export default function Home() {
   const [erps, setErps] = useState([]);
@@ -71,7 +72,7 @@ export default function Home() {
               <h2>{selectedErp.title || `${selectedErp.name} — Passo a passo`}</h2>
               <div className="tutorial-steps">
                 {selectedErp.message ? (
-                  <div dangerouslySetInnerHTML={{ __html: selectedErp.message }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedErp.message) }} />
                 ) : (
                   <p>As instruções para este sistema ainda não foram cadastradas.</p>
                 )}

@@ -4,8 +4,8 @@ export function middleware(req) {
   const basicAuth = req.headers.get('authorization');
   const url = req.nextUrl;
 
-  // Only protect the /admin path
-  if (url.pathname.startsWith('/admin')) {
+  // Protect both the /admin path and the /api/admin path
+  if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/admin')) {
     if (basicAuth) {
       const authValue = basicAuth.split(' ')[1];
       const [user, pwd] = atob(authValue).split(':');
@@ -24,5 +24,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };

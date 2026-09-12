@@ -60,11 +60,22 @@ export default function AdminPage() {
     if (confirm(`Tem certeza que deseja remover o ERP: ${erp.name}?`)) {
       setStatus({ text: "Removendo...", type: "loading" });
 
-      const { error } = await supabase.from("erps").delete().eq("name", erp.name);
+      try {
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('name', erp.name);
 
-      if (error) {
-        setStatus({ text: "Erro ao remover ERP.", type: "error" });
-      } else {
+        const response = await fetch('/api/admin/erps', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Erro desconhecido');
+        }
+
         setStatus({ text: "ERP removido com sucesso!", type: "success" });
         setSelectedIndex("");
         setName("");
@@ -73,6 +84,8 @@ export default function AdminPage() {
         setFile(null);
         if (formRef.current) formRef.current.reset();
         await loadErps();
+      } catch (error) {
+        setStatus({ text: `Erro ao remover ERP: ${error.message}`, type: "error" });
       }
     }
   };
@@ -81,60 +94,50 @@ export default function AdminPage() {
     e.preventDefault();
     setStatus({ text: "Salvando...", type: "loading" });
 
-    let imagePath = erps[selectedIndex]?.image || null;
+    try {
+      const formData = new FormData();
+      formData.append('action', 'save');
+      formData.append('name', name);
+      formData.append('title', title);
+      formData.append('message', message);
 
-    // Handle Image Upload to Supabase Storage if file is present
-    if (file) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-      const filePath = `tutorials/${fileName}`;
+      const isUpdate = selectedIndex !== "";
+      formData.append('isUpdate', isUpdate);
 
-      const { error: uploadError, data } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error("Upload error", uploadError);
-        setStatus({ text: `Erro ao enviar imagem: ${uploadError.message}`, type: "error" });
-        return;
+      if (isUpdate) {
+        formData.append('originalName', erps[selectedIndex].name);
+        if (erps[selectedIndex].image) {
+          formData.append('currentImage', erps[selectedIndex].image);
+        }
       }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath);
-      imagePath = publicUrl;
-    }
+      if (file) {
+        formData.append('file', file);
+      }
 
-    const erpData = {
-      name,
-      title,
-      message,
-      image: imagePath,
-    };
+      const response = await fetch('/api/admin/erps', {
+        method: 'POST',
+        body: formData
+      });
 
-    let error;
-    if (selectedIndex === "") {
-        // Insert
-        const { error: insertErr } = await supabase.from("erps").insert([erpData]);
-        error = insertErr;
-    } else {
-        // Update
-        const { error: updateErr } = await supabase.from("erps").update(erpData).eq("name", erps[selectedIndex].name);
-        error = updateErr;
-    }
+      const data = await response.json();
 
-    if (error) {
-        console.error("Save error", error);
-        setStatus({ text: `Erro ao salvar ERP: ${error.message}`, type: "error" });
-    } else {
-        setStatus({ text: "ERP salvo com sucesso!", type: "success" });
-        if (selectedIndex === "") {
-            setName("");
-            setTitle("");
-            setMessage("");
-            setFile(null);
-            if (formRef.current) formRef.current.reset();
-        }
-        await loadErps();
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro desconhecido ao salvar ERP');
+      }
+
+      setStatus({ text: "ERP salvo com sucesso!", type: "success" });
+      if (selectedIndex === "") {
+          setName("");
+          setTitle("");
+          setMessage("");
+          setFile(null);
+          if (formRef.current) formRef.current.reset();
+      }
+      await loadErps();
+    } catch (error) {
+      console.error("Save error", error);
+      setStatus({ text: `Erro ao salvar ERP: ${error.message}`, type: "error" });
     }
   };
 
