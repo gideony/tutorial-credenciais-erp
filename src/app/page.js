@@ -90,16 +90,10 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="footer">
+      <footer className="footer" style={{ justifyContent: 'center', textAlign: 'center' }}>
         <div className="footer-col">
           <div className="logo">Azos soft House</div>
           <p>Financeiro, Suporte, Wi-Fi, Notificações Inteligentes e Marketplace em um único aplicativo com a marca, as cores e a cara do seu provedor, publicado no iOS e Android.</p>
-        </div>
-        <div className="footer-col">
-          <h4>LEGAL</h4>
-          <a href="#">Fale conosco</a>
-          <a href="#">Termos de Uso</a>
-          <a href="#">Privacidade & LGPD</a>
         </div>
       </footer>
     </>
