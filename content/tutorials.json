@@ -1,0 +1,9 @@
+{
+  "systems": [
+    {
+      "name": "SGP",
+      "content": "## SGP — Passo a passo\n\n**Passo 1:** Acesse Administração > Integrações > Tokens.\n\n**Passo 2:** Clique em \"Adicionar token\" no canto superior direito. Em descrição, digite \"Azos\". Em aplicações, clique no botão \"+\" e digite \"Azos\" nos dois campos.\n\n**Passo 3:** Após salvar, o token será gerado. Seu App: Azos / Seu Token: a chave gerada / Sua URL: o ende",
+      "image": "images/img_4106.png"
+    }
+  ]
+}
