@@ -6,8 +6,16 @@ import { supabase } from "@/lib/supabase";
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 
-// Dynamically import react-quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+// Dynamically import react-quill to avoid SSR issues and forward the ref properly
+const ReactQuill = dynamic(
+  async () => {
+    const { default: RQ } = await import("react-quill");
+    return function comp({ forwardedRef, ...props }) {
+      return <RQ ref={forwardedRef} {...props} />;
+    };
+  },
+  { ssr: false }
+);
 
 export default function AdminPage() {
   const [erps, setErps] = useState([]);
@@ -303,7 +311,7 @@ export default function AdminPage() {
           <div className="form-group">
             <label htmlFor="erpMessage">Corpo do Texto</label>
             <ReactQuill
-              ref={quillRef}
+              forwardedRef={quillRef}
               theme="snow"
               value={message}
               onChange={setMessage}
